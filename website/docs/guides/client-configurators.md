@@ -5,7 +5,7 @@ This guide explains how MCP client configurators work in this repo and how to ad
 It covers:
 
 - **Typical JSON-file clients** (Cursor, VSCode GitHub Copilot, VSCode Insiders, GitHub Copilot CLI, Windsurf, Kiro, Trae, Antigravity 2.0, Antigravity IDE, etc.).
-- **Special clients** like **Claude CLI**, **Codex**, and **OpenClaw** that require custom logic.
+- **Special clients** like **Claude CLI**, **Codex**, **OpenClaw**, and **DeepSeek Harness** that require custom logic.
 - **How to add a new configurator class** so it shows up automatically in the MCP for Unity window.
 
 ## Quick example: JSON-file configurator
@@ -172,6 +172,15 @@ Some clients cannot be handled by the generic JSON configurator alone.
 - When Unity MCP is set to stdio, the configurator writes a `uvx ... mcp-for-unity --transport stdio` subprocess entry.
 - The bridge exposes a single proxy tool such as `unityMCP__call`, which then forwards to Unity MCP tool names.
 - OpenClaw support follows the currently selected MCP for Unity transport (via `openclaw-mcp-bridge`).
+
+### DeepSeek Harness (YAML patch layer)
+
+- Uses a custom configurator (`DshConfigurator`) because DSH configures MCP servers through a [Cordis](https://github.com/cordiverse/cordis) patch layer, not a JSON `mcp.json`.
+- Writes `$DSH_HOME/cordis.patch.yml` (`DSH_HOME` defaults to `~/.dsh`) — the home-level user patch layer DSH applies over every profile's own `cordis.patch.yml`, so one write covers `dsh web`, `dsh cli`, and every other profile on the machine.
+- HTTP transport writes a `url` + `transport: streamable-http` row; stdio writes `command` + `args` for `uvx ... mcp-for-unity --transport stdio`. Remote-hosted HTTP adds the `X-API-Key` header.
+- Unity tools appear in DSH as `mcp__unity__<tool>` (for example `mcp__unity__manage_gameobject`). `toolCallTimeoutMs` is written as 300000 because Unity-side imports, compiles, and test runs routinely outlive the bridge's 60s default.
+- Only the `mcp-unity` row is touched: comments and every other row in the patch file are preserved, and `Unregister` removes just that row.
+- DSH bridges MCP **tools** only — resources and prompts are not exposed, so the `mcpforunity://` resources are not visible to a DSH session.
 
 ---
 

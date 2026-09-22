@@ -26,6 +26,7 @@ MCP for Unity auto-configures every client the package detects on your machine. 
 | **Gemini CLI** | HTTP | yes | yes | yes | Auto-connects. |
 | **OpenClaw** | HTTP / stdio | yes | yes | yes | Requires `openclaw-mcp-bridge` plugin enabled. Follows MCP for Unity's transport choice. |
 | **Antigravity** | HTTP | yes | yes | varies | Requires an MCP toggle in Antigravity settings. |
+| **DeepSeek Harness** | HTTP / stdio | yes | — | — | Writes the `$DSH_HOME/cordis.patch.yml` patch layer; restart `dsh` afterwards. |
 
 ## How to pick
 
@@ -33,6 +34,7 @@ MCP for Unity auto-configures every client the package detects on your machine. 
 - **You're building a multi-agent or remote workflow**: anything HTTP. Multiple clients can share one Python server; see [Multi-Instance Routing](/guides/multi-instance).
 - **You're already in your IDE**: Cursor, VS Code Copilot, or Cline — keeps you in flow.
 - **You want a terminal**: Claude Code, Copilot CLI, Codex, Gemini CLI, or Qwen Code.
+- **You drive DeepSeek Harness**: use HTTP so `dsh web` and `dsh cli` attach to the shared server; the configurator writes the Harness patch layer and you restart `dsh` once.
 
 ## Manual configuration
 
